@@ -69,6 +69,7 @@ func (miner *CGMiner) runCommand(command string) (string, error) {
 	if err != nil {
 		return "", err
 	}
+	defer conn.Close()
 
 	type commandRequest struct {
 		Command string `json:"command"`
