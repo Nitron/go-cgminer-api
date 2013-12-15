@@ -48,10 +48,54 @@ type Summary struct {
 	WorkUtility            float64 `json:"Work Utility"`
 }
 
+type Pool struct {
+	Accepted int64
+	BestShare int64 `json:"Best Share"`
+	Diff1Shares int64 `json:"Diff1 Shares"`
+	DifficultyAccepted float64 `json:"Difficult Accepted"`
+	DifficultyRejected float64 `json:"DifficultyRejected"`
+	DifficultyStale float64 `json:"DifficultyStale"`
+	Discarded int64
+	GetFailures int64 `json:"Get Failures"`
+	Getworks int64
+	HasGBT bool `json:"Has GBT"`
+	HasStratum bool `json:"Has Stratum"`
+	LastShareDifficulty float64 `json:"Last Share Difficulty"`
+	LastShareTime int64 `json:"Last Share Time"`
+	LongPoll string `json:"Long Poll"`
+	Pool int64 `json:"POOL"`
+	PoolRejectedPercentage float64 `json:"Pool Rejected%"`
+	PoolStalePercentage float64 `json:"Pool Stale%"`
+	Priority int64
+	ProxyType string `json:"Proxy Type"`
+	Proxy string
+	Quota int64
+	Rejected int64
+	RemoteFailures int64 `json:"Remote Failures"`
+	Stale int64
+	Status string
+	StratumActive bool `json:"Stratum Active"`
+	StratumURL string `json:"Stratum URL"`
+	URL string
+	User string
+	Works int64
+}
+
 type summaryResponse struct {
 	Status  []status  `json:"STATUS"`
 	Summary []Summary `json:"SUMMARY"`
 	Id      int64     `json:"id"`
+}
+
+type poolsResponse struct {
+	Status []status `json:"STATUS"`
+	Pools []Pool `json:"POOLS"`
+	Id int64 `json:"id"`
+}
+
+type addPoolResponse struct {
+	Status []status `json:"STATUS"`
+	Id int64 `json:"id"`
 }
 
 // New returns a CGMiner pointer, which is used to communicate with a running
@@ -64,7 +108,7 @@ func New(hostname string, port int64) *CGMiner {
 	return miner
 }
 
-func (miner *CGMiner) runCommand(command string) (string, error) {
+func (miner *CGMiner) runCommand(command, argument string) (string, error) {
 	conn, err := net.Dial("tcp", miner.server)
 	if err != nil {
 		return "", err
@@ -73,10 +117,15 @@ func (miner *CGMiner) runCommand(command string) (string, error) {
 
 	type commandRequest struct {
 		Command string `json:"command"`
+		Parameter string `json:"parameter,omitempty"`
 	}
 
 	request := &commandRequest{
 		Command: command,
+	}
+
+	if argument != "" {
+		request.Parameter = argument
 	}
 
 	requestBody, err := json.Marshal(request)
@@ -94,7 +143,7 @@ func (miner *CGMiner) runCommand(command string) (string, error) {
 
 // Summary returns basic information on the miner. See the Summary struct.
 func (miner *CGMiner) Summary() (*Summary, error) {
-	result, err := miner.runCommand("summary")
+	result, err := miner.runCommand("summary", "")
 	if err != nil {
 		return nil, err
 	}
@@ -111,4 +160,72 @@ func (miner *CGMiner) Summary() (*Summary, error) {
 
 	var summary = summaryResponse.Summary[0]
 	return &summary, err
+}
+
+// Pools returns a slice of Pool structs, one per pool.
+func (miner *CGMiner) Pools() ([]Pool, error) {
+	result, err := miner.runCommand("pools", "")
+	if err != nil {
+		return nil, err
+	}
+
+	var poolsResponse poolsResponse
+	err = json.Unmarshal([]byte(result), &poolsResponse)
+	if err != nil {
+		return nil, err
+	}
+
+	var pools = poolsResponse.Pools
+	return pools, nil
+}
+
+// AddPool adds the given URL/username/password combination to the miner's
+// pool list.
+func (miner *CGMiner) AddPool(url, username, password string) error {
+	// TODO: Don't allow adding a pool that's already in the pool list
+	// TODO: Escape commas in the URL, username, and password
+	parameter := fmt.Sprintf("%s,%s,%s", url, username, password)
+	result, err := miner.runCommand("addpool", parameter)
+	if err != nil {
+		return err
+	}
+
+	var addPoolResponse addPoolResponse
+	err = json.Unmarshal([]byte(result), &addPoolResponse)
+	if err != nil {
+		// If there an error here, it's possible that the pool was actually added
+		return err
+	}
+
+	status := addPoolResponse.Status[0]
+
+	if status.Status != "S" {
+		return errors.New(fmt.Sprintf("%d: %s", status.Code, status.Description))
+	}
+
+	return nil
+}
+
+func (miner *CGMiner) Enable(pool *Pool) error {
+	parameter := fmt.Sprintf("%d", pool.Pool)
+	_, err := miner.runCommand("enablepool", parameter)
+	return err
+}
+
+func (miner *CGMiner) Disable(pool *Pool) error {
+	parameter := fmt.Sprintf("%d", pool.Pool)
+	_, err := miner.runCommand("disablepool", parameter)
+	return err
+}
+
+func (miner *CGMiner) Delete(pool *Pool) error {
+	parameter := fmt.Sprintf("%d", pool.Pool)
+	_, err := miner.runCommand("removepool", parameter)
+	return err
+}
+
+func (miner *CGMiner) SwitchPool(pool *Pool) error {
+	parameter := fmt.Sprintf("%d", pool.Pool)
+	_, err := miner.runCommand("switchpool", parameter)
+	return err	
 }
