@@ -52,9 +52,9 @@ type Pool struct {
 	Accepted               int64
 	BestShare              int64   `json:"Best Share"`
 	Diff1Shares            int64   `json:"Diff1 Shares"`
-	DifficultyAccepted     float64 `json:"Difficult Accepted"`
-	DifficultyRejected     float64 `json:"DifficultyRejected"`
-	DifficultyStale        float64 `json:"DifficultyStale"`
+	DifficultyAccepted     float64 `json:"Difficulty Accepted"`
+	DifficultyRejected     float64 `json:"Difficulty Rejected"`
+	DifficultyStale        float64 `json:"Difficulty Stale"`
 	Discarded              int64
 	GetFailures            int64 `json:"Get Failures"`
 	Getworks               int64
