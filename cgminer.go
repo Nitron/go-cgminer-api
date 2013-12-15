@@ -49,36 +49,36 @@ type Summary struct {
 }
 
 type Pool struct {
-	Accepted int64
-	BestShare int64 `json:"Best Share"`
-	Diff1Shares int64 `json:"Diff1 Shares"`
-	DifficultyAccepted float64 `json:"Difficult Accepted"`
-	DifficultyRejected float64 `json:"DifficultyRejected"`
-	DifficultyStale float64 `json:"DifficultyStale"`
-	Discarded int64
-	GetFailures int64 `json:"Get Failures"`
-	Getworks int64
-	HasGBT bool `json:"Has GBT"`
-	HasStratum bool `json:"Has Stratum"`
-	LastShareDifficulty float64 `json:"Last Share Difficulty"`
-	LastShareTime int64 `json:"Last Share Time"`
-	LongPoll string `json:"Long Poll"`
-	Pool int64 `json:"POOL"`
+	Accepted               int64
+	BestShare              int64   `json:"Best Share"`
+	Diff1Shares            int64   `json:"Diff1 Shares"`
+	DifficultyAccepted     float64 `json:"Difficult Accepted"`
+	DifficultyRejected     float64 `json:"DifficultyRejected"`
+	DifficultyStale        float64 `json:"DifficultyStale"`
+	Discarded              int64
+	GetFailures            int64 `json:"Get Failures"`
+	Getworks               int64
+	HasGBT                 bool    `json:"Has GBT"`
+	HasStratum             bool    `json:"Has Stratum"`
+	LastShareDifficulty    float64 `json:"Last Share Difficulty"`
+	LastShareTime          int64   `json:"Last Share Time"`
+	LongPoll               string  `json:"Long Poll"`
+	Pool                   int64   `json:"POOL"`
 	PoolRejectedPercentage float64 `json:"Pool Rejected%"`
-	PoolStalePercentage float64 `json:"Pool Stale%"`
-	Priority int64
-	ProxyType string `json:"Proxy Type"`
-	Proxy string
-	Quota int64
-	Rejected int64
-	RemoteFailures int64 `json:"Remote Failures"`
-	Stale int64
-	Status string
-	StratumActive bool `json:"Stratum Active"`
-	StratumURL string `json:"Stratum URL"`
-	URL string
-	User string
-	Works int64
+	PoolStalePercentage    float64 `json:"Pool Stale%"`
+	Priority               int64
+	ProxyType              string `json:"Proxy Type"`
+	Proxy                  string
+	Quota                  int64
+	Rejected               int64
+	RemoteFailures         int64 `json:"Remote Failures"`
+	Stale                  int64
+	Status                 string
+	StratumActive          bool   `json:"Stratum Active"`
+	StratumURL             string `json:"Stratum URL"`
+	URL                    string
+	User                   string
+	Works                  int64
 }
 
 type summaryResponse struct {
@@ -89,13 +89,13 @@ type summaryResponse struct {
 
 type poolsResponse struct {
 	Status []status `json:"STATUS"`
-	Pools []Pool `json:"POOLS"`
-	Id int64 `json:"id"`
+	Pools  []Pool   `json:"POOLS"`
+	Id     int64    `json:"id"`
 }
 
 type addPoolResponse struct {
 	Status []status `json:"STATUS"`
-	Id int64 `json:"id"`
+	Id     int64    `json:"id"`
 }
 
 // New returns a CGMiner pointer, which is used to communicate with a running
@@ -116,7 +116,7 @@ func (miner *CGMiner) runCommand(command, argument string) (string, error) {
 	defer conn.Close()
 
 	type commandRequest struct {
-		Command string `json:"command"`
+		Command   string `json:"command"`
 		Parameter string `json:"parameter,omitempty"`
 	}
 
@@ -227,5 +227,15 @@ func (miner *CGMiner) Delete(pool *Pool) error {
 func (miner *CGMiner) SwitchPool(pool *Pool) error {
 	parameter := fmt.Sprintf("%d", pool.Pool)
 	_, err := miner.runCommand("switchpool", parameter)
-	return err	
+	return err
+}
+
+func (miner *CGMiner) Restart() error {
+	_, err := miner.runCommand("restart", "")
+	return err
+}
+
+func (miner *CGMiner) Quit() error {
+	_, err := miner.runCommand("quit", "")
+	return err
 }
