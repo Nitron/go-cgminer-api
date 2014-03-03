@@ -48,6 +48,37 @@ type Summary struct {
 	WorkUtility            float64 `json:"Work Utility"`
 }
 
+type Devs struct {
+	GPU                    int64
+	Enabled                string
+	Status                 string
+	Temperature            float64
+	FanSpeed               int     `json:"Fan Speed"`
+	FanPercent             int64   `json:"Fan Percent"`
+	GPUClock               int64   `json:"GPU Clock"`
+	MemoryClock            int64   `json:"Memory Clock"`
+	GPUVoltage            float64 `json:"GPU Voltage"`
+	Powertune              int64
+	MHSav                  float64 `json:"MHS av"`
+	MHS5s                  float64 `json:"MHS 5s"`
+	Accepted               int64
+	Rejected               int64
+	HardwareErrors         int64   `json:"Hardware Errors"`
+	Utility                float64
+	Intensity              string
+	LastSharePool          int64   `json:"Last Share Pool"`
+	LashShareTime          int64   `json:"Lash Share Time"`
+	TotalMH                float64 `json:"TotalMH"`
+	Diff1Work              int64   `json:"Diff1 Work"`
+	DifficultyAccepted     float64 `json:"Difficulty Accepted"`
+	DifficultyRejected     float64 `json:"Difficulty Rejected"`
+	LastShareDifficulty    float64 `json:"Last Share Difficulty"`
+	LastValidWork          int64   `json:"Last Valid Work"`
+	DeviceHardware         float64 `json:"Device Hardware%"`
+	DeviceRejected         float64 `json:"Device Rejected%"`
+	DeviceElapsed          int64   `json:"Device Elapsed"`
+}
+
 type Pool struct {
 	Accepted               int64
 	BestShare              int64   `json:"Best Share"`
@@ -84,6 +115,12 @@ type Pool struct {
 type summaryResponse struct {
 	Status  []status  `json:"STATUS"`
 	Summary []Summary `json:"SUMMARY"`
+	Id      int64     `json:"id"`
+}
+
+type devsResponse struct {
+	Status  []status  `json:"STATUS"`
+	Devs    []Devs    `json:"DEVS"`
 	Id      int64     `json:"id"`
 }
 
@@ -139,6 +176,23 @@ func (miner *CGMiner) runCommand(command, argument string) (string, error) {
 		return "", err
 	}
 	return strings.TrimRight(result, "\x00"), nil
+}
+
+// Devs returns basic information on the miner. See the Devs struct.
+func (miner *CGMiner) Devs() (*[]Devs, error) {
+	result, err := miner.runCommand("devs", "")
+	if err != nil {
+		return nil, err
+	}
+
+	var devsResponse devsResponse
+	err = json.Unmarshal([]byte(result), &devsResponse)
+	if err != nil {
+		return nil, err
+	}
+
+	var devs = devsResponse.Devs
+	return &devs, err
 }
 
 // Summary returns basic information on the miner. See the Summary struct.
