@@ -11,11 +11,7 @@ import (
 // For now they're more of just a convenient scratch area for manual testing.
 
 func Test_Summary(t *testing.T) {
-<<<<<<< HEAD
 	miner := New("127.0.0.1", 4028)
-=======
-	miner := New("192.168.1.9", 4028)
->>>>>>> f3d517d8f4cd3880ea674daf326199d1484b016b
 	summary, err := miner.Summary()
 	if err != nil {
 		t.Error(err)
@@ -28,7 +24,6 @@ func Test_Summary(t *testing.T) {
 	// TODO: Make some assertions. Need to mock out the data source first?
 }
 
-<<<<<<< HEAD
 func Test_Devs(t *testing.T) {
 	miner := New("127.0.0.1", 4028)
 	devs, err := miner.Devs()
@@ -47,10 +42,6 @@ func Test_Devs(t *testing.T) {
 
 func Test_Pools(t *testing.T) {
 	miner := New("127.0.0.1", 4028)
-=======
-func Test_Pools(t *testing.T) {
-	miner := New("192.168.1.9", 4028)
->>>>>>> f3d517d8f4cd3880ea674daf326199d1484b016b
 	pools, err := miner.Pools()
 	if err != nil {
 		t.Error(err)

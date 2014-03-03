@@ -48,7 +48,6 @@ type Summary struct {
 	WorkUtility            float64 `json:"Work Utility"`
 }
 
-<<<<<<< HEAD
 type Devs struct {
 	GPU                    int64
 	Enabled                string
@@ -80,8 +79,6 @@ type Devs struct {
 	DeviceElapsed          int64   `json:"Device Elapsed"`
 }
 
-=======
->>>>>>> f3d517d8f4cd3880ea674daf326199d1484b016b
 type Pool struct {
 	Accepted               int64
 	BestShare              int64   `json:"Best Share"`
@@ -121,15 +118,12 @@ type summaryResponse struct {
 	Id      int64     `json:"id"`
 }
 
-<<<<<<< HEAD
 type devsResponse struct {
 	Status  []status  `json:"STATUS"`
 	Devs    []Devs    `json:"DEVS"`
 	Id      int64     `json:"id"`
 }
 
-=======
->>>>>>> f3d517d8f4cd3880ea674daf326199d1484b016b
 type poolsResponse struct {
 	Status []status `json:"STATUS"`
 	Pools  []Pool   `json:"POOLS"`
@@ -184,7 +178,6 @@ func (miner *CGMiner) runCommand(command, argument string) (string, error) {
 	return strings.TrimRight(result, "\x00"), nil
 }
 
-<<<<<<< HEAD
 // Devs returns basic information on the miner. See the Devs struct.
 func (miner *CGMiner) Devs() (*[]Devs, error) {
 	result, err := miner.runCommand("devs", "")
@@ -202,8 +195,6 @@ func (miner *CGMiner) Devs() (*[]Devs, error) {
 	return &devs, err
 }
 
-=======
->>>>>>> f3d517d8f4cd3880ea674daf326199d1484b016b
 // Summary returns basic information on the miner. See the Summary struct.
 func (miner *CGMiner) Summary() (*Summary, error) {
 	result, err := miner.runCommand("summary", "")
@@ -302,9 +293,3 @@ func (miner *CGMiner) Quit() error {
 	_, err := miner.runCommand("quit", "")
 	return err
 }
-<<<<<<< HEAD
-
-
-
-=======
->>>>>>> f3d517d8f4cd3880ea674daf326199d1484b016b
